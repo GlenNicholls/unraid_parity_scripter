@@ -4,13 +4,9 @@
 
 import logging
 import pprint
-import time
 
 from dataclasses import dataclass
-from datetime import datetime as dt
 from typing import Callable, Dict, List
-
-import containers
 
 logger = logging.getLogger(__name__)
 
@@ -78,12 +74,12 @@ class ParityStatus:
         )
 
 
-def run(
+def parity_logic(
     state: ParityStatus,
     start_funcs: List[Callable],
     stop_funcs: List[Callable],
 ) -> None:
-    """Monitor parity state and run scripts based on state changes.
+    """Check parity state and run scripts based on state changes.
 
     Args:
         state:
@@ -122,22 +118,3 @@ def run(
         (state.prev_started, state.prev_stopped) = (True, False)
     else:
         logger.info("Nothing to do. Skipping")
-
-
-if __name__ == "__main__":
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s - %(levelname)s - %(message)s    (%(pathname)s:%(lineno)d)"
-    )
-    check_interval = 300  # Check interval of parity check state in seconds
-    parity_state = ParityStatus()  # Init parity check dataclass obj
-    logger.info(f"Started monitoring parity state")
-    while True:
-        logger.info(f"Checking parity state")
-        run(
-            state=parity_state,
-            start_funcs=[containers.stop],
-            stop_funcs=[containers.stop],
-        )
-        logger.debug(f"Going to sleep for {check_interval}s")
-        time.sleep(check_interval)

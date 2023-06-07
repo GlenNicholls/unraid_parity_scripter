@@ -13,18 +13,16 @@ logger = logging.getLogger(__name__)
 def start(config: Path):
     """Start all containers."""
     config = get_config(config)
-    logger.info(
-        f"Starting the following containers: {pprint.pformat(config.containers)}"
-    )
     for container in config.containers:
+        logger.info(f"Starting the container '{container}'")
         sys_call(f"docker start {container}")
+    logger.info(f"All containers started ({config.containers})")
 
 
 def stop(config: Path):
     """Stop all containers."""
     config = get_config(config)
-    logger.info(
-        f"Stopping the following containers: {pprint.pformat(config.containers)}"
-    )
     for container in config.containers:
+        logger.info(f"Stopping the container '{container}'")
         sys_call(f"docker stop {container}")
+    logger.info(f"All containers stopped ({config.containers})")
