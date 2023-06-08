@@ -66,6 +66,6 @@ def _sys_call_wrap(command: str) -> SysCallMetadata:
 
     return SysCallMetadata(
         command=command,
-        successful=proc.returncode != 0,
+        successful=proc.returncode == 0,
         error_msg=err_msg,
     )

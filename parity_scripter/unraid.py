@@ -77,10 +77,11 @@ def sys_call(command: str) -> None:
         command:
             Command to run.
     """
-    meta = _sys_call_wrap(command)
-    if not meta.successful:
+    result = _sys_call_wrap(command)
+    if result.successful is False:
+        logger.error(f"System call metadata: {pprint.pformat(result)}")
         Notify(severity=Severity.warning, subject="System call failed").send(
-            meta.error_msg,
+            result.error_msg,
         )
 
 
