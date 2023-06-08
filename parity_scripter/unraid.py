@@ -75,7 +75,7 @@ def sys_call(command: str) -> None:
     """
     meta = _sys_call_wrap(command)
     if not meta.successful:
-        Notify(severity=Severity.alert, subject="System call failed").send(
+        Notify(severity=Severity.warning, subject="System call failed").send(
             meta.error_msg,
         )
 
