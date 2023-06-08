@@ -60,11 +60,9 @@ def _sys_call_wrap(command: str) -> SysCallMetadata:
     if proc.returncode !=0:
         err_msg = (
             f"System call '{command}' failed with non-zero exit code"
-            f" ({proc.returncode})."
+            f" ({proc.returncode}). \n stdout: {stdout} \n stderr: {stderr}"
         )
-        logger.error(
-            f"{err_msg} \n stdout: {stdout} \n stderr: {stderr}"
-        )
+        logger.error(err_msg)
 
     return SysCallMetadata(
         command=command,

@@ -56,10 +56,10 @@ class Notify:
         logger.debug("Sending notification to UI")
 
         def html_fmt(arg: str) -> str:
-            return arg.replace("'", "").replace("\n", "<br>").replace("\t", "    ")
+            return arg.replace("\n", "<br>").replace("\t", "    ").replace("\"", "")
 
         _sys_call_wrap(
-            "{script} -e '{e}' -i {i} -s '{s}' -d '{d}' -m '{m}'".format(
+            '{script} -e "{e}" -i "{i}" -s "{s}" -d "{d}" -m "{m}"'.format(
                 script=self._script_file,
                 e=NOTIFICATION_EVENT,
                 i=self.severity.value,
