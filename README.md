@@ -7,9 +7,13 @@ desireable location. The following is an example of the user script:
 
 ``` bash
 #!/bin/bash
+rm -rf main.zip* unraid_parity_scripter*
 
-python3 /mnt/<loc>/unraid_parity_scripter/parity_scripter/main.py \
-    -c /mnt/<config loc>/config.json \
+wget https://github.com/GlenNicholls/unraid_parity_scripter/archive/main.zip
+unzip main.zip
+
+python3 unraid_parity_scripter-main/parity_scripter/main.py \
+    -c /<config loc>/config.json \
     -s 300
 ```
 
@@ -19,9 +23,9 @@ the following:
 ``` json
 {
     "containers": [
-        "jellyfin",
         "unmanic",
-        "grafana"
+        "grafana",
+        "<other containers that consume IO>..."
     ]
 }
 ```
