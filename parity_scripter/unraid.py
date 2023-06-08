@@ -55,9 +55,9 @@ class Notify:
         #  use -b to NOT send a browser notification
         logger.debug("Sending notification to UI")
         _sys_call_wrap(
-            "{script} -e {e} -i {i} -s {s} -d {d} -m {m}".format(
+            "{script} -e '{e}' -i {i} -s '{s}' -d '{d}' -m '{m}'".format(
                 script=self._script_file,
-                e=NOTIFICATION_EVENT,
+                e={NOTIFICATION_EVENT},
                 i=self.severity.value,
                 s=self.subject,
                 d=msg,
