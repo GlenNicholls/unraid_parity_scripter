@@ -8,7 +8,7 @@ import time
 
 import containers
 from about import VERSION
-from monitor import parity_logic, ParityStatus
+from unraid import parity_logic, Notify, ParityStatus, Severity
 
 logger = logging.getLogger(__name__)
 
@@ -50,8 +50,11 @@ def run(args: argparse.Namespace):
     """Main application runner."""
     state = ParityStatus()  # Init parity check dataclass obj
     logger.info(f"Started monitoring parity state")
+    Notify(severity=Severity.normal, subject="Started monitoring parity state").send(
+        "Began monitoring parity check state to run start functions when parity check"
+        " starts and stop functions when parity check is stopped or paused."
+    )
     while True:
-        logger.info(f"Checking parity state")
         parity_logic(
             state=state,
             start_funcs=[lambda: containers.stop(args.config)],

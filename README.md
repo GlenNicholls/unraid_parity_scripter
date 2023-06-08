@@ -7,14 +7,23 @@ desireable location. The following is an example of the user script:
 
 ``` bash
 #!/bin/bash
-rm -rf main.zip* unraid_parity_scripter*
+echo "Removing stale versions of the app and installing clean"
+rm -rf *.zip* unraid_parity_scripter*
 
 wget https://github.com/GlenNicholls/unraid_parity_scripter/archive/main.zip
-unzip main.zip
+unzip *.zip
 
+# Noticed that when running script in background and aborting it, the process still ran
+# which led to weird behavior where bug fixes appeared not to work because notifications
+# and such were showing info from old versions
+echo "Killing any existing stale apps"
+pgrep -a -f unraid_parity_scripter
+pkill -e -f unraid_parity_scripter
+
+echo "Starting app"
 python3 unraid_parity_scripter-main/parity_scripter/main.py \
     -c /<config loc>/config.json \
-    -s 300
+    -s 15
 ```
 
 Where `-c` is the config file path and `-s` is the sleep/check interval. An example `config.json` looks like

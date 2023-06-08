@@ -4,7 +4,8 @@ import logging
 
 from pathlib import Path
 
-from utils import get_config, sys_call
+from utils import get_config
+from unraid import sys_call, Notify, Severity
 
 logger = logging.getLogger(__name__)
 
@@ -17,6 +18,9 @@ def start(config: Path):
         logger.debug(f"Starting container '{container}'")
         sys_call(f"docker start {container}")
     logger.info(f"The following containers have been started {config.containers}")
+    Notify(severity=Severity.normal, subject="Started containers").send(
+        f"Successfully started the following containers: {config.containers}"
+    )
 
 
 def stop(config: Path):
@@ -27,3 +31,6 @@ def stop(config: Path):
         logger.debug(f"Stopping container '{container}'")
         sys_call(f"docker stop {container}")
     logger.info(f"The following containers have been stopped {config.containers}")
+    Notify(severity=Severity.normal, subject="Stopped containers").send(
+        f"Successfully stopped the following containers: {config.containers}"
+    )

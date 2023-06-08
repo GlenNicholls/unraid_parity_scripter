@@ -20,6 +20,18 @@ class Config:
     """Cotainers to stop during parity check and start after it completes."""
 
 
+@dataclasses.dataclass
+class SysCallMetadata:
+    command: str
+    """Command that was run."""
+
+    successful: bool
+    """True if the command was successful."""
+
+    error_msg: str
+    """Error message for the call."""
+
+
 def get_config(file: Path) -> Config:
     """Parses JSON file and returns config object."""
 
@@ -30,19 +42,30 @@ def get_config(file: Path) -> Config:
     return Config(**data)
 
 
-def sys_call(command: str) -> None:
-    """Run a system call and capturing the output."""
+def _sys_call_wrap(command: str) -> SysCallMetadata:
+    """Run a system call and return metadata with info about the call."""
     logger.debug(f"Running the following system call: {command}")
     proc = subprocess.run(shlex.split(command), capture_output=True, text=True)
 
+    def fmt(arg: str) -> str:
+        return "\n\t " + arg.lstrip().rstrip().replace("\n", "\n\t ")
+
     # Re-format stdout/stderr for logging.
-    stdout = [f"\n\t {i.strip()}" for i in proc.stdout.split("\n")]
-    stderr = [f"\n\t {i.strip()}" for i in proc.stderr.split("\n")]
+    stdout = fmt(proc.stdout)
+    stderr = fmt(proc.stderr)
     logger.debug(stdout)
 
     # Log error when call fails.
+    err_msg = ""
     if proc.returncode !=0:
-        logger.error(
-            f"Return code for system call '{command}' was non-zero ({proc.returncode})."
-            f"\n stdout: {stdout} \n stderr: {stderr}"
+        err_msg = (
+            f"System call '{command}' failed with non-zero exit code"
+            f" ({proc.returncode}). \n stdout: {stdout} \n stderr: {stderr}"
         )
+        logger.error(err_msg)
+
+    return SysCallMetadata(
+        command=command,
+        successful=proc.returncode == 0,
+        error_msg=err_msg,
+    )

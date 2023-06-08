@@ -1,26 +1,104 @@
-"""Script to allow running scripts when parity checks are started/stopped."""
+"""Unraid API."""
 
+import enum
 import logging
 import pprint
 
 from dataclasses import dataclass
 from typing import Callable, Dict, List
 
+from about import NOTIFICATION_EVENT
+from utils import _sys_call_wrap
+
 logger = logging.getLogger(__name__)
+
+
+class Severity(enum.Enum):
+    normal = "normal"
+    warning = "warning"
+    alert = "alert"
+
+
+@dataclass
+class Notify:
+    """WebUI Notifications."""
+
+    severity: Severity
+    """Severity level for the notitifaction."""
+
+    subject: str
+    """Subject of the notification."""
+
+    _script_file = "/usr/local/emhttp/webGui/scripts/notify"
+
+    def send(self, msg: str, long_msg: str = "") -> None:
+        """Send notification to UI.
+
+        Args:
+            msg:
+                Short description for the notification.
+            long_msg:
+                Long description for the notification.
+        """
+        #Usage: notify [-e "event"] [-s "subject"] [-d "description"]
+        #       [-i "normal|warning|alert"] [-m "message"] [-x] [-t] [-b] [add]
+        #  create a notification
+        #  use -e to specify the event
+        #  use -s to specify a subject
+        #  use -d to specify a short description
+        #  use -i to specify the severity
+        #  use -m to specify a message (long description)
+        #  use -l to specify a link (clicking the notification will take you to that location)
+        #  use -x to create a single notification ticket
+        #  use -r to specify recipients and not use default
+        #  use -t to force send email only (for testing)
+        #  use -b to NOT send a browser notification
+        logger.debug("Sending notification to UI")
+
+        def html_fmt(arg: str) -> str:
+            return arg.replace("\n", "<br>").replace("\t", "    ").replace("\"", "")
+
+        _sys_call_wrap(
+            '{script} -e "{e}" -i "{i}" -s "{s}" -d "{d}" -m "{m}"'.format(
+                script=self._script_file,
+                e=NOTIFICATION_EVENT,
+                i=self.severity.value,
+                s=self.subject,
+                d=html_fmt(msg),
+                m=html_fmt(long_msg),
+            )
+        )
+
+
+def sys_call(command: str) -> None:
+    """Execute system call and send notification to web UI if there was a failure.
+
+    Args:
+        command:
+            Command to run.
+    """
+    result = _sys_call_wrap(command)
+    if result.successful is False:
+        logger.error(f"System call metadata: {pprint.pformat(result)}")
+        Notify(severity=Severity.warning, subject="System call failed").send(
+            result.error_msg,
+        )
 
 
 @dataclass
 class ParityStatus:
-    """Parity status dataclass."""
+    """Parity check status dataclass."""
 
     prev_started: bool = False
     prev_stopped: bool = False
+
+    _var_file = "/var/local/emhttp/var.ini"
 
     def get_status(self) -> Dict[str, str]:
         """Return a dict of the variables/status file."""
         logger.debug("Getting status")
         data = dict()
-        with open("/var/local/emhttp/var.ini") as f:
+        with open(self._var_file) as f:
             for line in f:
                 data[line.split("=")[0]] = line.split("=")[1].rstrip().replace('"', "")
 
@@ -115,4 +193,4 @@ def parity_logic(
             func()
         (state.prev_started, state.prev_stopped) = (True, False)
     else:
-        logger.info("Nothing to do. Skipping")
+        logger.debug("Nothing to do. Skipping")
