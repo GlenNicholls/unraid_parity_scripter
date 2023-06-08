@@ -7,12 +7,13 @@ import logging
 import time
 
 import containers
+from about import VERSION
 from monitor import parity_logic, ParityStatus
 
 logger = logging.getLogger(__name__)
 
 
-def parse_args():
+def parse_args() -> argparse.Namespace:
     """Parse command line arguments."""
 
     parser = argparse.ArgumentParser(
@@ -40,17 +41,13 @@ def parse_args():
         help="Sleep/check interval of of parity check status updates",
     )
     parser.add_argument("-v", "--verbose", help="Enable verbose/debug logging")
+    parser.add_argument("--version", action="version", version=f"%(prog)s v{VERSION}")
 
     return parser.parse_args()
 
 
-def run():
+def run(args: argparse.Namespace):
     """Main application runner."""
-    args = parse_args()
-    logging.basicConfig(
-        level=logging.DEBUG if args.verbose else logging.INFO,
-        format=args.format,
-    )
     state = ParityStatus()  # Init parity check dataclass obj
     logger.info(f"Started monitoring parity state")
     while True:
@@ -65,4 +62,9 @@ def run():
 
 
 if __name__ == "__main__":
-    run()
+    args = parse_args()
+    logging.basicConfig(
+        level=logging.DEBUG if args.verbose else logging.INFO,
+        format=args.format,
+    )
+    run(args)
