@@ -55,7 +55,6 @@ def run(args: argparse.Namespace):
         " starts and stop functions when parity check is stopped or paused."
     )
     while True:
-        logger.info(f"Checking parity state")
         parity_logic(
             state=state,
             start_funcs=[lambda: containers.stop(args.config)],

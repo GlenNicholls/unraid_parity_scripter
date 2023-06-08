@@ -188,4 +188,4 @@ def parity_logic(
             func()
         (state.prev_started, state.prev_stopped) = (True, False)
     else:
-        logger.info("Nothing to do. Skipping")
+        logger.debug("Nothing to do. Skipping")
