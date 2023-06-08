@@ -32,5 +32,17 @@ def get_config(file: Path) -> Config:
 
 def sys_call(command: str) -> None:
     """Run a system call and capturing the output."""
-    logger.debug(f"Running the following system call '{command}'")
-    subprocess.run(shlex.split(command), capture_output=True, check=True)
+    logger.debug(f"Running the following system call: {command}")
+    proc = subprocess.run(shlex.split(command), capture_output=True, text=True)
+
+    # Re-format stdout/stderr for logging.
+    stdout = [f"\n\t {i.strip()}" for i in proc.stdout.split("\n")]
+    stderr = [f"\n\t {i.strip()}" for i in proc.stderr.split("\n")]
+    logger.debug(stdout)
+
+    # Log error when call fails.
+    if proc.returncode !=0:
+        logger.error(
+            f"Return code for system call '{command}' was non-zero ({proc.returncode})."
+            f"\n stdout: {stdout} \n stderr: {stderr}"
+        )

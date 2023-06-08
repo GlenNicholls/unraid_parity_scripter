@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 """Script to allow running scripts when parity checks are started/stopped."""
 
 import logging
