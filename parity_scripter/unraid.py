@@ -54,14 +54,18 @@ class Notify:
         #  use -t to force send email only (for testing)
         #  use -b to NOT send a browser notification
         logger.debug("Sending notification to UI")
+
+        def html_fmt(arg: str) -> str:
+            return arg.replace("'", "").replace("\n", "<br>").replace("\t", "    ")
+
         _sys_call_wrap(
             "{script} -e '{e}' -i {i} -s '{s}' -d '{d}' -m '{m}'".format(
                 script=self._script_file,
                 e=NOTIFICATION_EVENT,
                 i=self.severity.value,
                 s=self.subject,
-                d=msg,
-                m=long_msg,
+                d=html_fmt(msg),
+                m=html_fmt(long_msg),
             )
         )
 
