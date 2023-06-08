@@ -1,1 +1,2 @@
-VERSION = "0.1.1"
+NOTIFICATION_EVENT = "Parity Scripter"
+VERSION = "0.2.0"
