@@ -8,31 +8,30 @@ desirable location. The following is an example for how I use the script:
 ``` bash
 #!/bin/bash
 echo "Removing stale versions of the app and installing clean"
-rm -rf *.zip* unraid_parity_scripter*
+rm -f parity_scripter.pyz
+wget https://github.com/GlenNicholls/unraid_parity_scripter/releases/download/latest/parity_scripter.pyz
+chmod +x parity_scripter.pyz
 
 cat >config.json <<EOL
 {
     "containers": [
         "unmanic",
-        "duplicacy"
+        "duplicacy",
+        "postgres-jellystat",
+        "jellystat"
     ]
 }
 EOL
 
-wget https://github.com/GlenNicholls/unraid_parity_scripter/archive/main.zip
-unzip *.zip
-
-# Noticed that when running script in background and aborting it, the process still ran 
+# Noticed that when running script in background and aborting it, the process still ran
 # which led to weird behavior where bug fixes appeared not to work because notifications
 # and such were showing info from old versions
 echo "Killing any existing stale apps"
-pgrep -a -f unraid_parity_scripter
-pkill -e -f unraid_parity_scripter
+pgrep -a -f parity_scripter
+pkill -e -f parity_scripter
 
 echo "Starting app"
-python3 unraid_parity_scripter-main/parity_scripter/main.py \
-    -c config.json \
-    -s 300
+./parity_scripter.pyz -c config.json -s 300
 ```
 
 Where `-c` is the config file path and `-s` is the sleep/check interval. An example `config.json` looks like
