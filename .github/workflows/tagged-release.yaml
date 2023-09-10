@@ -27,6 +27,7 @@ jobs:
         author_name: GlenNicholls
         author_email: GlenNicholls@users.noreply.github.com
         committer_name: Action Bot
+        new_branch: release/${{github.ref_name}}
         message: "ci: Updated application version and pushed tag"
         pathspec_error_handling: exitImmediately
         push: true
