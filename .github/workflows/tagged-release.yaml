@@ -16,10 +16,10 @@ jobs:
       with:
         python-version: "3.9"
     - uses: pocket-apps/action-update-version@v1
-        with:
-          files: parity_scripter/about.py
-          version-regexp: "\d+.\d+.\d+"
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        files: parity_scripter/about.py
+        version-regexp: "\d+.\d+.\d+"
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
     - name: Package application
       run: |
         python -m pip install --upgrade pip
