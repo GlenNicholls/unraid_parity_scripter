@@ -7,8 +7,8 @@ import pprint
 from dataclasses import dataclass
 from typing import Callable, Dict, List
 
-from about import NOTIFICATION_EVENT
-from utils import _sys_call_wrap
+from .about import NOTIFICATION_EVENT
+from .utils import _sys_call_wrap
 
 logger = logging.getLogger(__name__)
 

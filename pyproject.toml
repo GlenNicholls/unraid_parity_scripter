@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools>=61.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "parity_scripter"
+requires-python = ">=3.9"
+dynamic = ["version"]
+dependencies = []
+
+[project.scripts]
+parity_scripter = "parity_scripter:main"
+
+[tool.setuptools.dynamic]
+version = {attr = "parity_scripter.__version__"}
