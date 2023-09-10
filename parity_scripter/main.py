@@ -6,9 +6,9 @@ import argparse
 import logging
 import time
 
-import containers
-from about import VERSION
-from unraid import parity_logic, Notify, ParityStatus, Severity
+from .about import VERSION
+from .containers import start, stop
+from .unraid import parity_logic, Notify, ParityStatus, Severity
 
 logger = logging.getLogger(__name__)
 
@@ -46,8 +46,13 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def run(args: argparse.Namespace):
+def main():
     """Main application runner."""
+    args = parse_args()
+    logging.basicConfig(
+        level=logging.DEBUG if args.verbose else logging.INFO,
+        format=args.format,
+    )
     state = ParityStatus()  # Init parity check dataclass obj
     logger.info(f"Started monitoring parity state")
     Notify(severity=Severity.normal, subject="Started monitoring parity state").send(
@@ -65,9 +70,4 @@ def run(args: argparse.Namespace):
 
 
 if __name__ == "__main__":
-    args = parse_args()
-    logging.basicConfig(
-        level=logging.DEBUG if args.verbose else logging.INFO,
-        format=args.format,
-    )
-    run(args)
+    main()

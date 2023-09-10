@@ -3,14 +3,15 @@
 import logging
 
 from pathlib import Path
+from typing import List
 
-from utils import get_config
-from unraid import sys_call, Notify, Severity
+from .utils import get_config
+from .unraid import sys_call, Notify, Severity
 
 logger = logging.getLogger(__name__)
 
 
-def start(config: Path):
+def start(config: List[Path]):
     """Start all containers."""
     config = get_config(config)
     logger.info("Starting containers")
@@ -23,7 +24,7 @@ def start(config: Path):
     )
 
 
-def stop(config: Path):
+def stop(config: List[Path]):
     """Stop all containers."""
     config = get_config(config)
     logger.info("Stoppig containers")
