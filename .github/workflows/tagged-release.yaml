@@ -19,7 +19,7 @@ jobs:
       run: |
         # Only replace version pattern on line containing VERSION
         set -ex
-        pattern = '\d+.\d+.\d+'
+        pattern = "\d+.\d+.\d+"
         version = "${ ${{github.ref_name}} | sed 's/v//g' }"
         echo 'Setting parity_scripter/about.py version to $version'
         sed -i -E '/VERSION/s/$pattern/$version/g' parity_scripter/about.py
