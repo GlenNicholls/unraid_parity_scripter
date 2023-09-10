@@ -18,7 +18,7 @@ jobs:
         python -m pip install --upgrade pip
         python -m pip install .
         python -m zipapp parity_scripter -m "parity_scripter:main" -p "/usr/bin/env python3" -c
-    - uses: "marvinpinto/action-automatic-releases@v1"
+    - uses: "marvinpinto/action-automatic-releases@v1.2.1"
       with:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
         automatic_release_tag: "latest"
