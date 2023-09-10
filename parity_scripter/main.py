@@ -62,8 +62,8 @@ def main():
     while True:
         parity_logic(
             state=state,
-            start_funcs=[lambda: containers.stop(args.config)],
-            stop_funcs=[lambda: containers.start(args.config)],
+            start_funcs=[lambda: stop(args.config)],
+            stop_funcs=[lambda: start(args.config)],
         )
         logger.debug(f"Going to sleep for {args.sleep}s")
         time.sleep(args.sleep)
