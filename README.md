@@ -15,10 +15,8 @@ chmod +x parity_scripter.pyz
 cat >config.json <<EOL
 {
     "containers": [
-        "unmanic",
         "duplicacy",
-        "postgres-jellystat",
-        "jellystat"
+        "postgres"
     ]
 }
 EOL
