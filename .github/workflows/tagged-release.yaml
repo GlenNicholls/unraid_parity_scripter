@@ -18,7 +18,7 @@ jobs:
     - name: Update application version based on tag
       run: |
         set -ex
-        pattern = "\d+.\d+.\d+"
+        pattern = "[0-9]+\.[0-9]+\.[0-9]+"
         version = "${ ${{github.ref_name}} | sed 's/v//g' }"
         echo "Setting parity_scripter/about.py version to $version"
         sed -i -E '/VERSION/s/$pattern/$version/g' parity_scripter/about.py
