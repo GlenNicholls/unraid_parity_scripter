@@ -28,7 +28,7 @@ jobs:
         pathspec_error_handling: exitImmediately
         add: parity_scripter/about.py
         message: "ci: Updated application version and pushed tag"
-        push: origin/main --force --set-upstream
+        push: origin HEAD --force --set-upstream
         tag: ${{github.ref_name}} --force
         tag_push: --force
     - name: Package application
