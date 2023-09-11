@@ -6,7 +6,9 @@ build-backend = "setuptools.build_meta"
 name = "parity_scripter"
 requires-python = ">=3.9"
 dynamic = ["version"]
-dependencies = []
+dependencies = [
+    "pyraid",
+]
 
 [project.scripts]
 parity_scripter = "parity_scripter:main"
