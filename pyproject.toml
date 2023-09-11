@@ -7,7 +7,7 @@ name = "parity_scripter"
 requires-python = ">=3.9"
 dynamic = ["version"]
 dependencies = [
-    "pyraid",
+    "externals/pyraid",
 ]
 
 [project.scripts]

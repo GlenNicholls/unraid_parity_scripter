@@ -16,6 +16,7 @@ jobs:
     - name: Package application
       run: |
         python -m pip install --upgrade pip
+        python -m pip install externals/* --upgrade --target build
         python -m pip install . --upgrade --target build
         python -m zipapp build -m "parity_scripter:main" -p "/usr/bin/env python3" -c -o parity_scripter.pyz
     - uses: "marvinpinto/action-automatic-releases@v1.2.1"
