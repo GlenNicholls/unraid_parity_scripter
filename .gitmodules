@@ -1,6 +1,3 @@
-[submodule "pyraid"]
-	path = externals/pyraid
-	url = https://github.com/GlenNicholls/pyraid.git
 [submodule "externals/pyraid"]
 	path = externals/pyraid
 	url = https://github.com/GlenNicholls/pyraid
