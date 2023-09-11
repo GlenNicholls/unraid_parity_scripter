@@ -6,11 +6,61 @@ import argparse
 import logging
 import time
 
+from typing import List, Callable
+
+from . import EVENT
 from .about import VERSION
-from .containers import start, stop
-from .unraid import parity_logic, Notify, ParityStatus, Severity
+from .utils import Config
+
+from pyraid.containers import Docker
+from pyraid.unraid import Notify, ParityStatus, Severity
 
 logger = logging.getLogger(__name__)
+
+
+def parity_logic(
+    state: ParityStatus,
+    start_funcs: List[Callable],
+    stop_funcs: List[Callable],
+) -> None:
+    """Check parity state and run scripts based on state changes.
+
+    Args:
+        state:
+            Instance of parity check status object.
+        start_funcs:
+            Callables to run when parity is started/resumed.
+        stop_funcs:
+            Callables to run when parity is stopped/paused.
+    """
+    logger.debug(
+        "Checking parity state to determine if start/stop funcs need to be run"
+    )
+
+    # running when mdResyncPos>0 and mdResync>0, paused when mdResyncPos>=0 and
+    # mdResync==0, stopped when mdResyncPos==0 and mdResync==0
+    if state.is_stopped or state.is_paused and not state.prev_stopped:
+        # Parity changed to stopped but we haven't run stop funcs yet. Change state so
+        # stopped is run and started has not been run.
+        logger.info(
+            "Parity check is stopped but stop functions haven't been run, calling stop"
+            " functions."
+        )
+        for func in stop_funcs:
+            func()
+        (state.prev_stopped, state.prev_started) = (True, False)
+    elif state.is_running and not state.prev_started:
+        # Parity changed to started but we haven't run start funcs yet. Change state so
+        # start is run and stopped has not been run.
+        logger.info(
+            "Parity check is started but start functions haven't been run, calling"
+            " start functions."
+        )
+        for func in start_funcs:
+            func()
+        (state.prev_started, state.prev_stopped) = (True, False)
+    else:
+        logger.debug("Nothing to do. Skipping")
 
 
 def parse_args() -> argparse.Namespace:
@@ -53,17 +103,23 @@ def main():
         level=logging.DEBUG if args.verbose else logging.INFO,
         format=args.format,
     )
-    state = ParityStatus()  # Init parity check dataclass obj
+    state = ParityStatus()
     logger.info(f"Started monitoring parity state")
-    Notify(severity=Severity.normal, subject="Started monitoring parity state").send(
+    Notify(
+        severity=Severity.normal,
+        subject="Started monitoring parity state",
+        notification_event=EVENT,
+    ).send(
         "Began monitoring parity check state to run start functions when parity check"
         " starts and stop functions when parity check is stopped or paused."
     )
+    cfg = Config.parse(args.config)
+    docker = Docker()
     while True:
         parity_logic(
             state=state,
-            start_funcs=[lambda: stop(args.config)],
-            stop_funcs=[lambda: start(args.config)],
+            start_funcs=[lambda: docker.stop(i) for i in cfg.containers],
+            stop_funcs=[lambda: docker.start(i) for i in cfg.containers],
         )
         logger.debug(f"Going to sleep for {args.sleep}s")
         time.sleep(args.sleep)
