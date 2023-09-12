@@ -1,17 +1,22 @@
 [build-system]
-requires = ["setuptools>=61.0.0", "wheel"]
+requires = [
+    "setuptools>=61.0.0",
+    "wheel",
+    "pyraid @ git+https://github.com/GlenNicholls/pyraid.git@main",
+]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "parity_scripter"
 requires-python = ">=3.9"
 dynamic = ["version"]
-dependencies = [
-    "pyraid",
-]
+dependencies = ["pyraid @ git+https://github.com/GlenNicholls/pyraid.git@main"]
 
 [project.scripts]
 parity_scripter = "parity_scripter:main"
 
 [tool.setuptools.dynamic]
 version = {attr = "parity_scripter.__version__"}
+
+[tool.setuptools.packages.find]
+where = ["src"]

@@ -8,8 +8,7 @@ import time
 
 from typing import List, Callable
 
-from . import EVENT
-from .about import VERSION
+from .about import EVENT, VERSION
 from .utils import Config
 
 from pyraid.containers import Docker

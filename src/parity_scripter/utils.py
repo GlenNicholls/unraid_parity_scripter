@@ -19,6 +19,6 @@ class Config:
     """Cotainers to stop during parity check and start after it completes."""
 
     @classmethod
-    def parse(file: Path) -> "Config":
+    def parse(cls, file: Path) -> "Config":
         """Return dataclass of parsed config."""
-        return Config(**parse_json(file))
+        return cls(**parse_json(file))
