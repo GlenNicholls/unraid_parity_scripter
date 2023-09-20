@@ -117,8 +117,8 @@ def main():
     while True:
         parity_logic(
             state=state,
-            start_funcs=[lambda: docker.stop(i) for i in cfg.containers],
-            stop_funcs=[lambda: docker.start(i) for i in cfg.containers],
+            start_funcs=[lambda x=i: docker.stop(x) for i in cfg.containers],
+            stop_funcs=[lambda x=i: docker.start(x) for i in cfg.containers],
         )
         logger.debug(f"Going to sleep for {args.sleep}s")
         time.sleep(args.sleep)
