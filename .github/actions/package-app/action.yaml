@@ -9,6 +9,12 @@ inputs:
   python-version:
     description: Python version
     default: "3.9"
+
+outputs:
+  app:
+    description: Packaged application
+    value: ${{ steps.pkg.outputs.app }}
+
 runs:
   using: composite
   steps:
@@ -20,8 +26,9 @@ runs:
     shell: bash -el {0}
     run: python -m pip install -U pip
   - name: Package app
+    id: pkg
     shell: bash -el {0}
     run: |
       python -m pip install -U --target build .
       python -m zipapp build -m "${{ inputs.app-name }}:${{ inputs.entrypoint }}" -p "/usr/bin/env python3" -c -o ${{ inputs.app-name }}.pyz
-      echo "APP=${{ inputs.app-name }}.pyz" >> $GITHUB_OUTPUT
+      echo "app=${{ inputs.app-name }}.pyz" >> $GITHUB_OUTPUT

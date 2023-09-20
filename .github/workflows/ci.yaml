@@ -1,0 +1,101 @@
+name: ci
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  check-version:
+    if: github.event_name == 'pull_request' && startsWith(github.head_ref, 'release/v')
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Package application
+      id: package
+      uses: ./.github/actions/package-app
+      with:
+        app-name: parity_scripter
+        entrypoint: main
+        python-version: "3.9"
+    - name: Check app version
+      uses: ./.github/actions/check-version
+      with:
+        app: ${{ steps.package.outputs.app }}
+        ref_name: ${{ github.head_ref }}
+
+  app-build:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    outputs:
+      app: ${{ steps.package.outputs.app }}
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Package application
+      id: package
+      uses: ./.github/actions/package-app
+      with:
+        app-name: parity_scripter
+        entrypoint: main
+        python-version: "3.9"
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: app
+        path: ${{ steps.package.outputs.app }}
+
+  pre-release:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: write
+    needs: [app-build]
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Download artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: app
+    - name: Create Pre-Release
+      uses: softprops/action-gh-release@v1
+      with:
+        name: Development Build
+        tag_name: latest
+        draft: false
+        prerelease: true
+        token: ${{ secrets.GITHUB_TOKEN }}
+        files: |
+          LICENSE
+          ${{ needs.app-build.outputs.app }}
+
+  release:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && contains( github.event.head_commit.message, 'release/' )
+    permissions:
+      contents: write
+    needs: [app-build]
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Download artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: app
+    - name: Get version
+      id: version
+      run: echo "version=$(python ${{ needs.app-build.outputs.app }} --version)" >> $GITHUB_OUTPUT
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        name: v${{ steps.version.outputs.version }}
+        tag_name: v${{ steps.version.outputs.version }}
+        draft: false
+        prerelease: false
+        token: ${{ secrets.GITHUB_TOKEN }}
+        files: |
+          LICENSE
+          ${{ needs.app-build.outputs.app }}
