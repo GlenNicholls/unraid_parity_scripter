@@ -1,13 +1,13 @@
 name: Update application version
 description: |
   Update the application version in a file by extracting the version from
-  github.ref_name, e.g. release/v1.2.1 would set the version to 1.2.1.
+  github.head_ref, e.g. release/v1.2.1 would set the version to 1.2.1.
   The version will only be updated on a line that containes "VERSION".
 inputs:
   file:
     description: File path to modify
   ref_name:
-    description: github.ref_name to extract the version from, e.g. release/v1.2.1
+    description: Ref to extract the version from, e.g. release/v1.2.1
 runs:
   using: composite
   steps:

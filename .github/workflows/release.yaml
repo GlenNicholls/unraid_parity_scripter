@@ -21,7 +21,7 @@ jobs:
       id: update_version
       with:
         file: src/parity_scripter/about.py
-        ref_name: ${{ github.ref_name }}
+        ref_name: ${{ github.head_ref }}
     - uses: stefanzweifel/git-auto-commit-action@v4
       with:
         commit_message: "ci: Updated app version to ${{ steps.update_version.outputs.VERSION }}"
