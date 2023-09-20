@@ -2,9 +2,9 @@ name: Package application
 description: Package python application using zipapp
 inputs:
   app-name:
-    description: Application name
+    description: App name
   entrypoint:
-    description: Entry-point for python application, e.g. main.
+    description: Entry-point for python app, e.g. main.
     default: main
   python-version:
     description: Python version
