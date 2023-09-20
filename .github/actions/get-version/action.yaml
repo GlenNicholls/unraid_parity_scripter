@@ -1,0 +1,21 @@
+name: Get Version
+description: Get semantic version from file
+inputs:
+  file:
+    description: File to parse for semantic version
+
+outputs:
+  version:
+    description: Packaged application
+    value: ${{ steps.parse.outputs.version }}
+
+runs:
+  using: composite
+  steps:
+  - name: Parse version
+    id: parse
+    shell: bash -el {0}
+    run: |
+      version="$(grep -Eo '[0-9]+\.[0-9]+\.[0-9]+' ${{ inputs.file }})"
+      echo "Found version $version in file ${{ inputs.file }}"
+      echo "version=$version" >> $GITHUB_OUTPUT
