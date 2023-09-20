@@ -113,6 +113,7 @@ def main():
         " starts and stop functions when parity check is stopped or paused."
     )
     cfg = Config.parse(args.config)
+    print(cfg.containers)
     docker = Docker()
     while True:
         parity_logic(
