@@ -42,7 +42,7 @@ jobs:
         python-version: "3.9"
     - name: Get version
       id: version
-      run: echo "VERSION=$(python parity_scripter --version)" >> $GITHUB_OUTPUT
+      run: echo "VERSION=$(python parity_scripter.pyz --version)" >> $GITHUB_OUTPUT
     - name: Create Release
       if: contains( github.event.head_commit.message, 'release/' )
       uses: softprops/action-gh-release@v1
@@ -55,8 +55,6 @@ jobs:
         files: |
           LICENSE
           ${{ steps.package.outputs.APP }}
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Create Pre-Release
       uses: softprops/action-gh-release@v1
       with:
