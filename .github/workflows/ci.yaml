@@ -9,11 +9,12 @@ on:
 jobs:
   get-current-version:
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.get-version.outputs.version }}
 
     steps:
     - uses: actions/checkout@v4
-    - name: Check app version
-      id: current-version
+    - id: get-version
       uses: ./.github/actions/get-version
       with:
         file: src/parity_scripter/about.py
