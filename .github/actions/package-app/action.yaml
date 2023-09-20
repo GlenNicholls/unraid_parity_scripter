@@ -1,0 +1,27 @@
+name: Package application
+description: Package python application using zipapp
+inputs:
+  app-name:
+    description: Application name
+  entrypoint:
+    description: Entry-point for python application, e.g. main.
+    default: main
+  python-version:
+    description: Python version
+    default: "3.9"
+runs:
+  using: composite
+  steps:
+  - name: Set up Python ${{ inputs.python-version }}
+    uses: actions/setup-python@v3
+    with:
+      python-version: ${{ inputs.python-version }}
+  - name: Update pip
+    shell: bash -el {0}
+    run: python -m pip install -U pip
+  - name: Package app
+    shell: bash -el {0}
+    run: |
+      python -m pip install -U --target build .
+      python -m zipapp build -m "${{ inputs.app-name }}:${{ inputs.entrypoint }}" -p "/usr/bin/env python3" -c -o ${{ inputs.app-name }}.pyz
+      echo "APP=${{ inputs.app-name }}.pyz" >> $GITHUB_OUTPUT
