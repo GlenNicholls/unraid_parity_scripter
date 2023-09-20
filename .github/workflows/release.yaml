@@ -2,13 +2,14 @@ name: release
 
 on:
   pull_request:
-    branches: ["release/v*"]
+    types: [opened]
+    branches: [main]
   push:
     branches: [main]
 
 jobs:
   update-version:
-    if: github.event_name == 'pull_request' && github.event.action == 'opened'
+    if: github.event_name == 'pull_request' && startsWith(github.head_ref, 'release/v')
     permissions:
       contents: write
     runs-on: ubuntu-latest
