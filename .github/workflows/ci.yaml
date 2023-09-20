@@ -1,0 +1,114 @@
+name: ci
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  get-current-version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.get-version.outputs.version }}
+
+    steps:
+    - uses: actions/checkout@v4
+    - id: get-version
+      uses: ./.github/actions/get-version
+      with:
+        file: src/parity_scripter/about.py
+
+  check-version:
+    if: github.event_name == 'pull_request' && startsWith(github.head_ref, 'release/v')
+    runs-on: ubuntu-latest
+    needs: [get-current-version]
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Get expected version
+      id: expected-version
+      shell: bash -el {0}
+      run: |
+        version=$(echo "${{ github.head_ref }}" | sed -e 's+release/v++g')
+        echo "version=$version" >> $GITHUB_OUTPUT
+    - name: Check version
+      shell: bash -el {0}
+      run: |
+        expect_version=${{ steps.expected-version.outputs.version }}
+        got_version=${{ needs.get-current-version.outputs.version }}
+        if [ "$got_version" != "$expect_version" ]; then
+          echo "Error: Version mismatch, update the app version. Expected $expect_version but found $got_version."
+          exit 1
+        fi
+
+  app-build:
+    runs-on: ubuntu-latest
+    outputs:
+      app: ${{ steps.package.outputs.app }}
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Package application
+      id: package
+      uses: ./.github/actions/package-app
+      with:
+        app-name: parity_scripter
+        entrypoint: main
+        python-version: "3.9"
+    - name: Upload artifacts
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      uses: actions/upload-artifact@v3
+      with:
+        name: app
+        path: ${{ steps.package.outputs.app }}
+
+  pre-release:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    needs: [app-build]
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Download artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: app
+    - name: Create Pre-Release
+      uses: softprops/action-gh-release@v1
+      with:
+        name: Development Build
+        tag_name: latest
+        draft: false
+        prerelease: true
+        token: ${{ secrets.GITHUB_TOKEN }}
+        files: |
+          LICENSE
+          ${{ needs.app-build.outputs.app }}
+
+  release:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && contains( github.event.head_commit.message, 'release/' )
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    needs: [app-build, get-current-version]
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Download artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: app
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        name: v${{ needs.get-current-version.outputs.version }}
+        tag_name: v${{ needs.get-current-version.outputs.version }}
+        draft: false
+        prerelease: false
+        token: ${{ secrets.GITHUB_TOKEN }}
+        files: |
+          LICENSE
+          ${{ needs.app-build.outputs.app }}
