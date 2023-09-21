@@ -6,6 +6,11 @@ on:
   push:
     branches: [main]
 
+env:
+  APP_NAME: parity_scripter
+  ENTRYPOINT: main
+  PYTHON_VERSION: "3.9"
+
 jobs:
   get-current-version:
     runs-on: ubuntu-latest
@@ -17,7 +22,7 @@ jobs:
     - id: get-version
       uses: ./.github/actions/get-version
       with:
-        file: src/parity_scripter/about.py
+        file: src/$APP_NAME/about.py
 
   check-version:
     if: github.event_name == 'pull_request' && startsWith(github.head_ref, 'release/v')
@@ -53,9 +58,9 @@ jobs:
       id: package
       uses: ./.github/actions/package-app
       with:
-        app-name: parity_scripter
-        entrypoint: main
-        python-version: "3.9"
+        app-name: $APP_NAME
+        entrypoint: $ENTRYPOINT
+        python-version: $PYTHON_VERSION
     - name: Upload artifacts
       uses: actions/upload-artifact@v3
       with:
