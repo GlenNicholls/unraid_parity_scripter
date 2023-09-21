@@ -9,7 +9,6 @@ on:
 env:
   APP_NAME: parity_scripter
   ENTRYPOINT: main
-  PYTHON_VERSION: "3.9"
 
 jobs:
   get-current-version:
@@ -60,7 +59,7 @@ jobs:
       with:
         app-name: $APP_NAME
         entrypoint: $ENTRYPOINT
-        python-version: $PYTHON_VERSION
+        python-version: "3.9"
     - name: Upload artifacts
       uses: actions/upload-artifact@v3
       with:
